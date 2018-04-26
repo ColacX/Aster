@@ -1,8 +1,9 @@
 const debug = console.log.bind(console);
 const error = console.error.bind(console);
 const canvas = document.querySelector("canvas");
-const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+const gl = canvas.getContext("experimental-webgl");
 let lastTime;
+const shaders = {};
 
 function requestFile(url) {
   return new Promise((resolve, reject) => {
@@ -22,12 +23,12 @@ function requestFile(url) {
   });
 }
 
-async function startProgram() {
+async function startGame() {
   if (!gl) {
     throw "failed to get gl context. your browser may does support webgl";
   }
 
-  loadShaderProgram(await requestFile("hello.vert.glsl"), await requestFile("hello.frag.glsl"));
+  shaders.hello = loadShaderProgram(await requestFile("hello.vert.glsl"), await requestFile("hello.frag.glsl"));
   window.requestAnimationFrame(firstFrame);
 }
 
@@ -73,7 +74,7 @@ function renderFrame(nowTime) {
   gl.clearColor(0.0, 0.5, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  simulateWorld(elapsedTime);
+  stepGame(elapsedTime);
   renderScene();
 
   lastTime = nowTime;
@@ -81,9 +82,11 @@ function renderFrame(nowTime) {
 }
 
 function renderScene() {
+  gl.useProgram(shaders.hello);
+  gl.drawArrays(gl.POINTS, 0, 1);
 }
 
-function simulateWorld(elapsedTime) {
+function stepGame(elapsedTime) {
 }
 
-startProgram();
+startGame();
