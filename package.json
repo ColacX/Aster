@@ -1,0 +1,13 @@
+{
+  "name": "Aster",
+  "version": "1.0.0",
+  "repository": "https://github.com/ColacX/Aster.git",
+  "author": "ColacX",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "fs-extra": "^5.0.0",
+    "md5": "^2.2.1"
+  }
+}
