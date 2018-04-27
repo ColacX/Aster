@@ -122,6 +122,11 @@ function loadModelCube(sourceCode) {
 
 function firstFrame(nowTime) {
   lastTime = nowTime;
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+  gl.cullFace(gl.BACK);
+
   window.requestAnimationFrame(renderFrame);
 }
 
@@ -143,7 +148,6 @@ function renderFrame(nowTime) {
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clearColor(0.529, 0.808, 0.922, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.enable(gl.DEPTH_TEST);
 
   stepGame(elapsedTime);
   renderScene();
