@@ -35,7 +35,7 @@ async function startGame() {
     throw "failed to get gl context. your browser may does support webgl";
   }
 
-  shaders.hello = await loadShader_Hello();
+  shaders.default = await loadShaderDefault();
   models.cube = loadModelCube(await requestFile("cube.dae"));
   window.requestAnimationFrame(firstFrame);
 }
@@ -83,8 +83,8 @@ function getUniform(program, key) {
   return v;
 }
 
-async function loadShader_Hello() {
-  const program = loadShaderProgram(await requestFile("hello.vert.glsl"), await requestFile("hello.frag.glsl"));
+async function loadShaderDefault() {
+  const program = loadShaderProgram(await requestFile("default.vert.glsl"), await requestFile("default.frag.glsl"));
 
   const shader = {
     program,
@@ -104,8 +104,6 @@ function loadModelCube(sourceCode) {
   const indicesData = xml.querySelector("geometry mesh triangles p").innerHTML.split(" ")
     .filter((v, i) => i % 2 == 0)
     .map(i => Number.parseInt(i));
-  debug('v', verticesData);
-  debug('i', indicesData);
 
   let bufferPosition = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferPosition);
@@ -155,7 +153,7 @@ function renderFrame(nowTime) {
 }
 
 function renderScene() {
-  gl.useProgram(shaders.hello.program);
+  gl.useProgram(shaders.default.program);
   // gl.drawArrays(gl.POINTS, 0, 1);
 
   // http://glmatrix.net/docs/module-mat4.html
@@ -165,10 +163,10 @@ function renderScene() {
   let r = mat4.fromYRotation(mat4.create(), rotation += 0.004);
   mat4.multiply(mvp, mvp, r);
 
-  gl.uniformMatrix4fv(shaders.hello.mvp, false, mvp);
+  gl.uniformMatrix4fv(shaders.default.mvp, false, mvp);
 
-  gl.enableVertexAttribArray(shaders.hello.position);
-  gl.vertexAttribPointer(shaders.hello.position, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(shaders.default.position);
+  gl.vertexAttribPointer(shaders.default.position, 3, gl.FLOAT, false, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, models.cube.bufferPosition);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, models.cube.bufferIndices);
 
