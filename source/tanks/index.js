@@ -63,7 +63,9 @@ function loadShaderProgram(vertexSource, fragmentSource) {
   gl.linkProgram(shaderProgram);
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    debug(gl.getProgramInfoLog(shaderProgram));
+    debug('program', gl.getProgramInfoLog(shaderProgram));
+    debug('vertex', gl.getShaderInfoLog(vertexShader));
+    debug('fragment', gl.getShaderInfoLog(fragmentShader));
   }
 
   return shaderProgram;
