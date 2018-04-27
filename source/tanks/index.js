@@ -97,14 +97,21 @@ async function loadShader_Hello() {
 function loadModelCube(sourceCode) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(sourceCode, "text/xml");
-  const verticesData = xml.querySelector("#Cube-mesh-positions-array").innerHTML.split(" ").map(i => Number.parseInt(i));
-  const indicesData = xml.querySelector("geometry mesh triangles p").innerHTML.split(" ").map(i => Number.parseFloat(i));
+  const verticesData = xml.querySelector("#Cube-mesh-positions-array").innerHTML.split(" ")
+    .map(i => Number.parseFloat(i));
 
-  var bufferPosition = gl.createBuffer();
+  // triangulate checkbox must be on in in blender
+  const indicesData = xml.querySelector("geometry mesh triangles p").innerHTML.split(" ")
+    .filter((v, i) => i % 2 == 0)
+    .map(i => Number.parseInt(i));
+  debug('v', verticesData);
+  debug('i', indicesData);
+
+  let bufferPosition = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferPosition);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesData), gl.STATIC_DRAW);
 
-  var bufferIndices = gl.createBuffer();
+  let bufferIndices = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufferIndices);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indicesData), gl.STATIC_DRAW);
 
@@ -121,8 +128,8 @@ function firstFrame(nowTime) {
 }
 
 function resizeCanvas() {
-  var displayWidth = canvas.clientWidth;
-  var displayHeight = canvas.clientHeight;
+  let displayWidth = canvas.clientWidth;
+  let displayHeight = canvas.clientHeight;
 
   if (canvas.width != displayWidth || canvas.height != displayHeight) {
     canvas.width = displayWidth;
@@ -138,6 +145,7 @@ function renderFrame(nowTime) {
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clearColor(0.529, 0.808, 0.922, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
 
   stepGame(elapsedTime);
   renderScene();
@@ -152,9 +160,9 @@ function renderScene() {
 
   // http://glmatrix.net/docs/module-mat4.html
   const mvp = mat4.create();
-  mat4.perspective(mvp, Math.PI / 2, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.0001, 1000.0);
+  mat4.perspective(mvp, Math.PI / 180.0 * 60.0, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.0001, 1000.0);
   mat4.translate(mvp, mvp, vec3.fromValues(0, 0, -3));
-  let r = mat4.fromYRotation(mat4.create(), rotation += 0.001);
+  let r = mat4.fromYRotation(mat4.create(), rotation += 0.004);
   mat4.multiply(mvp, mvp, r);
 
   gl.uniformMatrix4fv(shaders.hello.mvp, false, mvp);
@@ -164,7 +172,9 @@ function renderScene() {
   gl.bindBuffer(gl.ARRAY_BUFFER, models.cube.bufferPosition);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, models.cube.bufferIndices);
 
+  gl.lineWidth(1);
   gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+  // gl.drawArrays(gl.TRIANGLES, 0, 8);
 }
 
 function stepGame(elapsedTime) {
