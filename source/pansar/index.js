@@ -37,10 +37,31 @@ function loadAssets() {
   });
 }
 
-(async () => {
-  await loadAssets();
-
+function startGame() {
   engine.runRenderLoop(function () {
     scene.render();
   });
+}
+
+// https://www.html5rocks.com/en/tutorials/websockets/basics/
+function startNetwork() {
+  var connection = new WebSocket(`ws://${location.host}:9102`);
+
+  connection.onopen = function () {
+    connection.send('Ping');
+  };
+
+  connection.onerror = function (error) {
+    console.error(error);
+  };
+
+  connection.onmessage = function (e) {
+    console.log('server message: ', e);
+  };
+}
+
+(async () => {
+  await loadAssets();
+  startGame();
+  startNetwork();
 })();
