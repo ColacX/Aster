@@ -15,16 +15,82 @@ app.listen(listenPort, () => console.log('http://localhost:' + listenPort));
 const httpServer = http.createServer(app);
 const webSocketServer = new ws.Server({ server: httpServer, port: 9102 });
 
-webSocketServer.on('connection', (socket) => {
+let slaveSockets = [];
+let masterSocket = null;
 
-  //connection is up, let's add a simple simple event
-  socket.on('message', (message) => {
+webSocketServer.on('connection', (s) => {
+  console.log('new connection');
 
-    //log the received message and send it back to the client
-    console.log('received: %s', message);
-    socket.send(`Hello, you sent -> ${message}`);
+  sendJson(s, {
+    to: 'chat',
+    message: 'welcome',
   });
 
-  //send immediatly a feedback to the incoming connection    
-  socket.send('Hi there, I am a WebSocket server');
+  s.on('message', (message) => {
+    console.log('received', message);
+
+    try {
+      const m = JSON.parse(message);
+      switch (m.to) {
+        case "server":
+          handleMessageServer(m, s);
+          break;
+        case "master":
+          handleMessageMaster(m);
+          break;
+        case "slaves":
+          handleMessageSlaves(m);
+          break;
+        case "chat":
+          handleMessageChat(m);
+          break;
+        default:
+          console.error("unrecognized message", message);
+      }
+    }
+    catch (e) {
+      console.error(e);
+    }
+  });
 });
+
+function sendJson(s, o) {
+  s.send(JSON.stringify(o));
+}
+
+function handleMessageServer(m, s) {
+  switch (m.type) {
+    case "role":
+      if (m.isMaster) {
+        if (masterSocket) {
+          console.error('master already exists. todo handle this');
+        }
+        masterSocket = s;
+      }
+      else {
+        slaveSockets.push(s);
+      }
+      break;
+    default:
+      console.error('unrecognized message', m);
+  }
+}
+
+function handleMessageChat(m) {
+  slaveSockets.forEach(function (s) {
+    try {
+      sendJson(s, m);
+    }
+    catch (e) {
+      console.error(e);
+    }
+  });
+
+  sendJson(masterSocket, m);
+}
+
+function handleMessageMaster(m) {
+}
+
+function handleMessageSlaves(m) {
+}
