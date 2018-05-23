@@ -2,7 +2,11 @@ const canvas = document.querySelector("#canvas");
 const engine = new BABYLON.Engine(canvas, true);
 const Vec3 = BABYLON.Vector3;
 
-window.addEventListener("resize", function () {
+document.addEventListener("keyup", function (e) {
+  console.log(e.keyCode, e);
+}, false);
+
+window.addEventListener("resize", function (e) {
   engine.resize();
 });
 
@@ -28,10 +32,11 @@ scene.enablePhysics(new Vec3(0, -9.82, 0), new BABYLON.CannonJSPlugin());
 
 const camera = new BABYLON.FreeCamera("Camera", new Vec3(0, 10, 10), scene);
 camera.attachControl(engine.getRenderingCanvas());
-camera.keysUp = ['W'.charCodeAt(0)];
-camera.keysDown = ['S'.charCodeAt(0)];
-camera.keysLeft = ['A'.charCodeAt(0)];
-camera.keysRight = ['D'.charCodeAt(0)];
+camera.keysUp = [87];
+camera.keysDown = [83];
+camera.keysLeft = [65];
+camera.keysRight = [68];
+
 
 const light1 = new BABYLON.HemisphericLight("light1", new Vec3(10, 10, 0), scene);
 const light2 = new BABYLON.PointLight("light2", new Vec3(0, 10, -10), scene);
