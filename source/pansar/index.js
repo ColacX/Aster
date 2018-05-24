@@ -27,6 +27,15 @@ document.addEventListener("mspointerlockchange", pointerLockChange, false);
 document.addEventListener("mozpointerlockchange", pointerLockChange, false);
 document.addEventListener("webkitpointerlockchange", pointerLockChange, false);
 
+engine.loadingScreen = {
+  displayLoadingUI: function () {
+    console.log('loading');
+  },
+  hideLoadingUI: function () {
+    console.log('loaded');
+  }
+};
+
 const scene = new BABYLON.Scene(engine);
 scene.enablePhysics(new Vec3(0, -9.82, 0), new BABYLON.CannonJSPlugin());
 
@@ -36,7 +45,6 @@ camera.keysUp = [87];
 camera.keysDown = [83];
 camera.keysLeft = [65];
 camera.keysRight = [68];
-
 
 const light1 = new BABYLON.HemisphericLight("light1", new Vec3(10, 10, 0), scene);
 const light2 = new BABYLON.PointLight("light2", new Vec3(0, 10, -10), scene);
@@ -64,6 +72,13 @@ scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
     parameter: 'r'
   },
   function () { console.log('r button was released'); }
+));
+
+scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+  {
+    trigger: BABYLON.ActionManager.OnEveryFrameTrigger,
+  },
+  function () { console.log('frame'); }
 ));
 
 function loadAssets() {
