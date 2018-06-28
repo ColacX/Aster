@@ -15,37 +15,29 @@ app.listen(listenPort, () => console.log('http://localhost:' + listenPort));
 const httpServer = http.createServer(app);
 const webSocketServer = new ws.Server({ server: httpServer, port: 9102 });
 
-let slaveSockets = [];
-let masterSocket = null;
+let clientSockets = [];
 
-webSocketServer.on('connection', (s) => {
+webSocketServer.on('connection', (socket) => {
   console.log('new connection');
 
-  sendJson(s, {
+  clientSockets.push(socket);
+
+  sendJson(socket, {
     to: 'chat',
     message: 'welcome',
   });
 
-  s.on('message', (message) => {
-    console.log('received', message);
+  socket.on('message', (rawMessage) => {
+    console.log('received', rawMessage);
 
     try {
-      const m = JSON.parse(message);
-      switch (m.to) {
-        case "server":
-          handleMessageServer(m, s);
-          break;
-        case "master":
-          handleMessageMaster(m);
-          break;
-        case "slaves":
-          handleMessageSlaves(m);
-          break;
+      const message = JSON.parse(rawMessage);
+      switch (message.to) {
         case "chat":
-          handleMessageChat(m);
+          handleMessageChat(message);
           break;
         default:
-          console.error("unrecognized message", message);
+          console.error("unrecognized message", rawMessage);
       }
     }
     catch (e) {
@@ -58,39 +50,15 @@ function sendJson(s, o) {
   s.send(JSON.stringify(o));
 }
 
-function handleMessageServer(m, s) {
-  switch (m.type) {
-    case "role":
-      if (m.isMaster) {
-        if (masterSocket) {
-          console.error('master already exists. todo handle this');
-        }
-        masterSocket = s;
-      }
-      else {
-        slaveSockets.push(s);
-      }
-      break;
-    default:
-      console.error('unrecognized message', m);
-  }
-}
-
-function handleMessageChat(m) {
-  slaveSockets.forEach(function (s) {
+function handleMessageChat(message) {
+  clientSockets.forEach(function (socket) {
     try {
-      sendJson(s, m);
+      sendJson(socket, message);
     }
     catch (e) {
       console.error(e);
     }
   });
 
-  sendJson(masterSocket, m);
-}
-
-function handleMessageMaster(m) {
-}
-
-function handleMessageSlaves(m) {
+  sendJson(masterSocket, message);
 }
