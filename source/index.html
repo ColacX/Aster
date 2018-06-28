@@ -1,10 +1,34 @@
 <html>
 
-<head></head>
+<head>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    #canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    #menu {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      background-color: #ffffff80;
+    }
+  </style>
+</head>
 
 <body>
-  <a href="/tanks/">tanks</a>
-  <a href="/pansar/">pansar</a>
+  <canvas id="canvas"></canvas>
+  <script src="/shared/babylon.custom.js"></script>
+  <script src="index.js"></script>
 </body>
 
 </html>
