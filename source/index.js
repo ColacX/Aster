@@ -2,9 +2,42 @@ const canvas = document.querySelector("#canvas");
 const engine = new BABYLON.Engine(canvas, true);
 const Vec3 = BABYLON.Vector3;
 
-document.addEventListener("keyup", function (e) {
-  console.log(e.keyCode, e);
+let monkey = null;
+
+document.addEventListener("keydown", function (e) {
+  console.log('keydown', e.keyCode, e);
+
+  // https://doc.babylonjs.com/api/classes/babylon.physicsimpostor#applyimpulse
+  console.log(monkey);
+
+  switch(e.keyCode){
+    case 87: 
+      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, +1), monkey.getAbsolutePosition());
+      break;
+    case 83:
+      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, -1), monkey.getAbsolutePosition());
+      break;
+    case 65:
+      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(+1, 0, 0), monkey.getAbsolutePosition());
+      break;
+    case 68:
+      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), monkey.getAbsolutePosition());
+      break;
+    default:
+      break;
+  }
 }, false);
+
+document.addEventListener("keyup", function (e) {
+  console.log('keyup', e.keyCode, e);
+}, false);
+
+document.addEventListener('mousemove', function(e) {
+  if (document.pointerLockElement !== canvas && document.mozPointerLockElement !== canvas) {
+    return;
+  };
+  console.log('mousemove', e);
+});
 
 window.addEventListener("resize", function (e) {
   engine.resize();
@@ -39,12 +72,7 @@ engine.loadingScreen = {
 const scene = new BABYLON.Scene(engine);
 scene.enablePhysics(new Vec3(0, -9.82, 0), new BABYLON.CannonJSPlugin());
 
-const camera = new BABYLON.FreeCamera("Camera", new Vec3(0, 10, 10), scene);
-camera.attachControl(engine.getRenderingCanvas());
-camera.keysUp = [87];
-camera.keysDown = [83];
-camera.keysLeft = [65];
-camera.keysRight = [68];
+const camera = new BABYLON.FreeCamera("Camera", new Vec3(0, 0, 0), scene);
 
 const light1 = new BABYLON.HemisphericLight("light1", new Vec3(10, 10, 0), scene);
 const light2 = new BABYLON.PointLight("light2", new Vec3(0, 10, -10), scene);
@@ -88,9 +116,13 @@ function loadAssets() {
 
     meshTask.onSuccess = function (task) {
       task.loadedMeshes[0].position = new Vec3(0, 10, 0.1);
-      task.loadedMeshes[0].physicsImpostor = new BABYLON.PhysicsImpostor(task.loadedMeshes[0], BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
-
+      task.loadedMeshes[0].physicsImpostor = new BABYLON.PhysicsImpostor(task.loadedMeshes[0], BABYLON.PhysicsImpostor.SphereImpostor, {
+        mass: 1,
+        restitution: 0
+      }, scene);
       task.loadedMeshes[0].actionManager = new BABYLON.ActionManager(scene);
+      monkey = task.loadedMeshes[0];
+      camera.parent = monkey;
       resolve();
     }
 
