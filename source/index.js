@@ -56,17 +56,17 @@ document.addEventListener('mousemove', function(e) {
   let yawValue = e.movementX * 0.001;
   let pitchValue = e.movementY * 0.001;
 
-  boosterA.physicsImpostor.applyImpulse(
+  monkey.physicsImpostor.applyImpulse(
     boosterA.getDirection(BABYLON.Vector3.Forward()).scale(yawValue),
     boosterA.getAbsolutePosition()
   );
 
-  boosterB.physicsImpostor.applyImpulse(
-    boosterB.getDirection(BABYLON.Vector3.Forward()).scale(yawValue),
+  monkey.physicsImpostor.applyImpulse(
+    boosterB.getDirection(BABYLON.Vector3.Forward()).scale(-yawValue),
     boosterB.getAbsolutePosition()
   );
 
-  boosterC.physicsImpostor.applyImpulse(
+  monkey.physicsImpostor.applyImpulse(
     boosterC.getDirection(BABYLON.Vector3.Forward()).scale(pitchValue),
     boosterC.getAbsolutePosition()
   );
@@ -112,13 +112,6 @@ const light2 = new BABYLON.PointLight("light2", new Vec3(0, 10, -10), scene);
 
 var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 100, height: 100 }, scene);
 ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.9 }, scene);
-
-var box = BABYLON.MeshBuilder.CreateBox("box", { width: 1, height: 1, depth: 1 }, scene);
-box.position = new Vec3(0, 0, 0);
-
-var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
-sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
-sphere.position = new Vec3(0, 5, 0);
 
 var hdrTexture = new BABYLON.HDRCubeTexture("country.hdr", scene, 512);
 var skySphere = BABYLON.MeshBuilder.CreateSphere("sphere1", {
@@ -173,26 +166,14 @@ function loadAssets() {
 
       boosterA = BABYLON.MeshBuilder.CreateSphere("boosterA", { diameter: 1 }, scene);
       boosterA.parent = monkey;
-      boosterA.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
-        mass: 0.1,
-        restitution: 0.5
-      }, scene);
       boosterA.position = new Vec3(-1, 0, 0);
 
       boosterB = BABYLON.MeshBuilder.CreateSphere("boosterB", { diameter: 1 }, scene);
       boosterB.parent = monkey;
-      boosterB.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
-        mass: 0.1,
-        restitution: 0.5
-      }, scene);
       boosterB.position = new Vec3(+1, 0, 0);
 
       boosterC = BABYLON.MeshBuilder.CreateSphere("boosterC", { diameter: 1 }, scene);
       boosterC.parent = monkey;
-      boosterC.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
-        mass: 0.1,
-        restitution: 0.5
-      }, scene);
       boosterC.position = new Vec3(0, +1, 0);
 
       resolve();
