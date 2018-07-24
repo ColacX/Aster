@@ -4,6 +4,9 @@
   "repository": "https://github.com/ColacX/Aster.git",
   "author": "ColacX",
   "license": "MIT",
+  "scripts": {
+    "dev": "node source/server.js"
+  },
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
