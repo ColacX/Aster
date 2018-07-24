@@ -1,14 +1,17 @@
+// https://doc.babylonjs.com/api/
+// https://doc.babylonjs.com/api/classes/babylon.physicsimpostor#applyimpulse
+
 const canvas = document.querySelector("#canvas");
 const engine = new BABYLON.Engine(canvas, true);
 const Vec3 = BABYLON.Vector3;
 
-let monkey = null;
+var monkey = null;
+var boosterA = null;
+var boosterB = null;
+var boosterC = null;
 
 document.addEventListener("keydown", function (e) {
   console.log('keydown', e.keyCode, e);
-
-  // https://doc.babylonjs.com/api/classes/babylon.physicsimpostor#applyimpulse
-  console.log(monkey);
 
   switch(e.keyCode){
     case 87:
@@ -49,11 +52,24 @@ document.addEventListener('mousemove', function(e) {
   if (document.pointerLockElement !== canvas && document.mozPointerLockElement !== canvas) {
     return;
   };
-  // monkey.rotate(BABYLON.Axis.Y, e.movementX * 0.001, BABYLON.Space.LOCAL);
-  // monkey.rotate(BABYLON.Axis.X, e.movementY * 0.001, BABYLON.Space.LOCAL);
-  monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(e.movementX * 0.001, 0, 0), monkey.getAbsolutePosition() + new BABYLON.Vector3(+1, 0, 0));
-  monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, e.movementY * 0.001, 0), monkey.getAbsolutePosition() + new BABYLON.Vector3(0, +1, 0));
-  //monkey.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0,0,0,0));
+  
+  let yawValue = e.movementX * 0.001;
+  let pitchValue = e.movementY * 0.001;
+
+  boosterA.physicsImpostor.applyImpulse(
+    boosterA.getDirection(BABYLON.Vector3.Forward()).scale(yawValue),
+    boosterA.getAbsolutePosition()
+  );
+
+  boosterB.physicsImpostor.applyImpulse(
+    boosterB.getDirection(BABYLON.Vector3.Forward()).scale(yawValue),
+    boosterB.getAbsolutePosition()
+  );
+
+  boosterC.physicsImpostor.applyImpulse(
+    boosterC.getDirection(BABYLON.Vector3.Forward()).scale(pitchValue),
+    boosterC.getAbsolutePosition()
+  );
 });
 
 window.addEventListener("resize", function (e) {
@@ -100,7 +116,7 @@ ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpo
 var box = BABYLON.MeshBuilder.CreateBox("box", { width: 1, height: 1, depth: 1 }, scene);
 box.position = new Vec3(0, 0, 0);
 
-var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameterX: 1 }, scene);
+var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
 sphere.position = new Vec3(0, 5, 0);
 
@@ -154,6 +170,31 @@ function loadAssets() {
       monkey = task.loadedMeshes[0];
       camera.parent = monkey;
       camera.position = new Vec3(0, 0, -20);
+
+      boosterA = BABYLON.MeshBuilder.CreateSphere("boosterA", { diameter: 1 }, scene);
+      boosterA.parent = monkey;
+      boosterA.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
+        mass: 0.1,
+        restitution: 0.5
+      }, scene);
+      boosterA.position = new Vec3(-1, 0, 0);
+
+      boosterB = BABYLON.MeshBuilder.CreateSphere("boosterB", { diameter: 1 }, scene);
+      boosterB.parent = monkey;
+      boosterB.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
+        mass: 0.1,
+        restitution: 0.5
+      }, scene);
+      boosterB.position = new Vec3(+1, 0, 0);
+
+      boosterC = BABYLON.MeshBuilder.CreateSphere("boosterC", { diameter: 1 }, scene);
+      boosterC.parent = monkey;
+      boosterC.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, {
+        mass: 0.1,
+        restitution: 0.5
+      }, scene);
+      boosterC.position = new Vec3(0, +1, 0);
+
       resolve();
     }
 
