@@ -11,17 +11,30 @@ document.addEventListener("keydown", function (e) {
   console.log(monkey);
 
   switch(e.keyCode){
-    case 87: 
-      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, +1), monkey.getAbsolutePosition());
+    case 87:
+      // monkey.translate(BABYLON.Axis.Z, +1, BABYLON.Space.LOCAL);
+      // monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, +1), monkey.getAbsolutePosition());
       break;
     case 83:
-      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, -1), monkey.getAbsolutePosition());
+      // monkey.translate(BABYLON.Axis.Z, -1, BABYLON.Space.LOCAL);
+      // monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, -1), monkey.getAbsolutePosition());
       break;
     case 65:
-      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(+1, 0, 0), monkey.getAbsolutePosition());
+      // monkey.translate(BABYLON.Axis.X, -1, BABYLON.Space.LOCAL);
+      
       break;
     case 68:
-      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), monkey.getAbsolutePosition());
+      // monkey.translate(BABYLON.Axis.X, +1, BABYLON.Space.LOCAL);
+      //monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), monkey.getAbsolutePosition());
+      break;
+    case 32:
+      // monkey.translate(BABYLON.Axis.Y, +1, BABYLON.Space.LOCAL);
+      break;
+    case 69:
+      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, 0.001), monkey.getAbsolutePosition() + new BABYLON.Vector3(+1, 0, 0));
+      break;
+    case 81:
+      monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 0, 0.001), monkey.getAbsolutePosition() + new BABYLON.Vector3(-1, 0, 0));
       break;
     default:
       break;
@@ -36,7 +49,11 @@ document.addEventListener('mousemove', function(e) {
   if (document.pointerLockElement !== canvas && document.mozPointerLockElement !== canvas) {
     return;
   };
-  console.log('mousemove', e);
+  // monkey.rotate(BABYLON.Axis.Y, e.movementX * 0.001, BABYLON.Space.LOCAL);
+  // monkey.rotate(BABYLON.Axis.X, e.movementY * 0.001, BABYLON.Space.LOCAL);
+  monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(e.movementX * 0.001, 0, 0), monkey.getAbsolutePosition() + new BABYLON.Vector3(+1, 0, 0));
+  monkey.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, e.movementY * 0.001, 0), monkey.getAbsolutePosition() + new BABYLON.Vector3(0, +1, 0));
+  //monkey.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0,0,0,0));
 });
 
 window.addEventListener("resize", function (e) {
@@ -80,19 +97,32 @@ const light2 = new BABYLON.PointLight("light2", new Vec3(0, 10, -10), scene);
 var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 100, height: 100 }, scene);
 ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.9 }, scene);
 
+var box = BABYLON.MeshBuilder.CreateBox("box", { width: 1, height: 1, depth: 1 }, scene);
+box.position = new Vec3(0, 0, 0);
+
 var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", { diameterX: 1 }, scene);
 sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
 sphere.position = new Vec3(0, 5, 0);
 
+var hdrTexture = new BABYLON.HDRCubeTexture("country.hdr", scene, 512);
+var skySphere = BABYLON.MeshBuilder.CreateSphere("sphere1", {
+  segments: 32,
+  diameter: 1024,
+  sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+}, scene);
+var sphereMtl = new BABYLON.PBRMaterial("sphereMtl", scene);
+sphereMtl.backFaceCulling = false;
+sphereMtl.reflectionTexture = hdrTexture;
+skySphere.material = sphereMtl;
 scene.actionManager = new BABYLON.ActionManager(scene);
 
-scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-  {
-    trigger: BABYLON.ActionManager.OnKeyDownTrigger,
-    parameter: 'r'
-  },
-  function () { console.log('r button was pressed'); }
-));
+// scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+//   {
+//     trigger: BABYLON.ActionManager.OnKeyDownTrigger,
+//     parameter: 'r'
+//   },
+//   function () { console.log('r button was pressed'); }
+// ));
 
 scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
   {
@@ -123,6 +153,7 @@ function loadAssets() {
       task.loadedMeshes[0].actionManager = new BABYLON.ActionManager(scene);
       monkey = task.loadedMeshes[0];
       camera.parent = monkey;
+      camera.position = new Vec3(0, 0, -20);
       resolve();
     }
 
